@@ -8,8 +8,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Array::Utils qw(intersect);
 use Hash::Merge;
+use List::MoreUtils qw(arrayify);
 
-use experimental qw(signatures try);
+use experimental qw(signatures);
 
 sub register($self, $app, $conf) {
   my $cfg_dir = $app->home->child('cfg');
@@ -44,6 +45,28 @@ sub register($self, $app, $conf) {
       directory => $app->conf->db->migration->directory,
     }, $conf->{'Migration::Sqitch'}//{}),
   ) if(!exists($conf->{'Migration::Sqitch'}) || defined($conf->{'Migration::Sqitch'}));
+
+  # SendEmail
+  my $recipient_resolver = sub ($add) {
+    if(defined($add)) {
+      return [arrayify(map {__SUB__->($_)} $add->@*)] if(ref($add) eq 'ARRAY');
+      return $add if($add =~ /@/);
+      return __SUB__->($app->conf->email->recipients->{$add} // $app->conf->email->recipients->{default}) unless(ref($add));
+    }
+    return ();
+  };
+  $app->plugin(
+    'SendEmail' => $merge->merge({
+      from          => $app->conf->email->from,
+      host          => $app->conf->email->smtp->host,
+      port          => $app->conf->email->smtp->port,
+      ssl           => $app->conf->email->smtp->ssl,
+      sasl_username => $app->conf->email->smtp->sasl_username || undef, 
+      sasl_password => $app->conf->email->smtp->sasl_password || undef, 
+
+      recipient_resolver => $recipient_resolver,
+    }, $conf->{SendEmail}//{})
+  ) if(!exists($conf->{SendEmail}) || defined($conf->{'SendEmail'}));
 
 }
 
