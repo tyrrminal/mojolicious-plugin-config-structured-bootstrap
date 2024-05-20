@@ -219,6 +219,73 @@ sub register($self, $app, $app_config) {
   
 }
 
+=head1 NAME
+
+Mojolicious::Plugin::Config::Structured::Bootstrap - an extremely opinionated plugin for initializing a full-featured Mojolicious application
+
+=head1 SYNOPSIS
+
+  # in app startup
+  $self->plugin('Config::Structured::Bootstrap'); 
+
+  $self->plugin('Config::Structured::Bootstrap' => {
+    $plugin_name => \%plugin_config, ...
+  });
+
+=head1 DESCRIPTION
+
+This plugin loads and initializes a specific set of other mojo plugins based on 
+a predefined (though overridable) configuration structure:
+
+=over
+
+=item * L<Mojolicious::Plugin::Config::Structured>
+
+=item * L<Mojolicious::Plugin::Authentication::OIDC>
+
+=item * L<Mojolicious::Plugin::Authorization::AccessControl>
+
+=item * L<Mojolicious::Plugin::Cron::Scheduler>
+
+=item * L<Mojolicious::Plugin::Data::Transfigure>
+
+=item * L<Mojolicious::Plugin::Migration::Sqitch>
+
+=item * L<Mojolicious::Plugin::Module::Loader>
+
+=item * L<Mojolicious::Plugin::OpenAPI>
+
+=item * L<Mojolicious::Plugin::ORM::DBIx>
+
+=item * L<Mojolicious::Plugin::SendEmail>
+
+=item * L<Mojolicious::Plugin::Sessionless>
+
+=back
+
+Any plugin that is not installed is silently skipped; you can also disable any
+plugin by setting it to an undefined configuration during initialization, e.g.,:
+
+  $self->plugin('Config::Structured::Bootstrap' => {
+    Sessionless => undef
+  });
+
+Further documentation on how to manually/automatically configure these plugins
+is forthcoming...
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::Data::Transfigure> inherits all methods from 
+L<Mojolicious::Plugin> and implements the following new ones
+
+=head2 register
+
+Register the plugin in a Mojolicious application. Takes a HashRef as its 
+configuration argument. Each key of the HashRef is the name of a sub-plugin
+(e.g., C<Migration::Sqitch>, with or without its C<Mojolicious::Plugin::>) 
+prefix. Setting the config value for a plugin to C<undef> prevents loading that
+plugin.
+
 =head1 AUTHOR
 
 Mark Tyrrell C<< <mark@tyrrminal.dev> >>
