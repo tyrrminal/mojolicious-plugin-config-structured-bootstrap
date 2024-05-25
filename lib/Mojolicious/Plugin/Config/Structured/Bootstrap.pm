@@ -104,13 +104,6 @@ sub register($self, $app, $app_config) {
     schedules  => $app->conf->scheduled_tasks->to_hash,
   } });
 
-  $load->('Authentication::SAML' => sub { {
-    entity_id      => $app->conf->auth->entity_id,
-    metadata_url   => $app->conf->auth->metadata_url,
-    slo_url        => $app->conf->auth->slo_url,
-    sp_signing_key => $app->conf->auth->sp_signing_key
-  } });
-
   $load->('Authentication::OIDC' => sub { {
     client_secret  => $app->conf->auth->client_secret(1),
     public_key     => $app->conf->auth->public_key,
