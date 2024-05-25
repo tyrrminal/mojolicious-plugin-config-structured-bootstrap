@@ -119,6 +119,10 @@ sub register($self, $app, $app_config) {
     make_routes    => 0,
 
     get_token      => sub ($c) {
+      if(my $t = $c->cookie('oidc_auth_token')) {
+        $c->cookie(oidc_auth_token => '', {expires => 1});
+        return $t;
+      }
       if(($c->req->headers->authorization//'') =~ /^Bearer (.*)/) { return $1; }
       return undef;
     },
@@ -139,18 +143,9 @@ sub register($self, $app, $app_config) {
       $token->{realm_access}->{roles}
     },
 
-    on_success     => sub ($c, $token) {
-      $c->stash(token => $token);
-      my $tpl = <<'      END';
-        <!doctype html>
-        <html>
-          <script type="text/javascript">
-            localStorage.setItem("oidc_auth_token", "<%= $token %>");
-            location.replace("/login/success");
-          </script>
-        </html>
-      END
-      return $c->render(inline => $tpl);
+    on_success     => sub ($c, $token, $url) {
+      $c->cookie(oidc_auth_token => $token, { expires => time + 60 });
+      $c->redirect_to($url);
     },
     on_login => sub ($c, $u) {
       $u->update({last_login_at => \["NOW()"]});
