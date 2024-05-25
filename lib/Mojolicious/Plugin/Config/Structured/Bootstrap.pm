@@ -175,7 +175,7 @@ sub register($self, $app, $app_config) {
           return $c->$cb('User not authenticated') unless(defined($u));
           return $c->$cb('User email not verified') unless($u->email_verified);
           return $c->$cb() unless($scopes->@*);
-          return $c->$cb() if(intersect($scopes->@*, $c->current_user_roles->@*));
+          return $c->$cb() if(intersect($scopes->@*, $c->authn->current_user_roles->@*));
           return $c->$cb('User not authorized');
         } catch($e) {
           $e =~ s/( at \/.*)$//;
