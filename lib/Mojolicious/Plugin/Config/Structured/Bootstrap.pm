@@ -167,6 +167,7 @@ sub register($self, $app, $app_config) {
           my $u = $c->authn->current_user();
           return $c->$cb('User not authenticated') unless(defined($u));
           return $c->$cb('User email not verified') unless($u->email_verified);
+          return $c->$cb('User disabled/deleted') if($u->can('deleted_at') && defined($u->deleted_at) && $u->deleted_at < DateTime->now());
           return $c->$cb() unless($scopes->@*);
           return $c->$cb() if(intersect($scopes->@*, $c->authn->current_user_roles->@*));
           return $c->$cb('User not authorized');
