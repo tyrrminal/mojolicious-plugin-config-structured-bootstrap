@@ -11,6 +11,7 @@ use Hash::Merge;
 use HTTP::Status qw(:constants status_message);
 use List::MoreUtils qw(arrayify);
 use Module::Loadable qw(module_loadable);
+use DateTime::Format::MySQL;
 use Readonly;
 use Syntax::Keyword::Try;
 
@@ -141,11 +142,13 @@ sub register($self, $app, $app_config) {
       $c->redirect_to($url);
     },
     on_login => sub ($c, $u) {
-      $u->update({last_login_at => \["NOW()"]});
-      $u->update({last_activity_at => \["NOW()"]});
+      my $now = DateTime::Format::MySQL->format_datetime(DateTime->now(time_zone => 'local'));
+      $u->update({last_login_at => $now});
+      $u->update({last_activity_at => $now});
     },
     on_activity => sub ($c, $u) {
-      $u->update({last_activity_at => \["NOW()"]})
+      my $now = DateTime::Format::MySQL->format_datetime(DateTime->now(time_zone => 'local'));
+      $u->update({last_activity_at => $now})
     }
   } });
 
