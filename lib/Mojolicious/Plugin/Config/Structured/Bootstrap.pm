@@ -113,11 +113,7 @@ sub register($self, $app, $app_config) {
     make_routes    => 0,
 
     get_token      => sub ($c) {
-      if(my $t = $c->cookie('oidc_auth_token')) {
-        $c->cookie(oidc_auth_token => '', {expires => 1});
-        return $t;
-      }
-      if(($c->req->headers->authorization//'') =~ /^Bearer (.*)/) { return $1; }
+      if(my $t = $c->cookie('oidc_auth_token'))                                             { return $t; }
       return undef;
     },
     get_user       => sub ($token) {
