@@ -114,6 +114,8 @@ sub register($self, $app, $app_config) {
 
     get_token      => sub ($c) {
       if(my $t = $c->cookie('oidc_auth_token'))                                             { return $t; }
+      if(($c->req->headers->authorization//'') =~ /^Bearer (.*)/)                           { return $1; }
+      if(($c->req->headers->header('Sec-WebSocket-Protocol')//'') =~ /^access_token, (.*)/) { return $1; }
       return undef;
     },
     get_user       => sub ($token) {
