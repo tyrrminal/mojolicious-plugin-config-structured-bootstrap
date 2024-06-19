@@ -146,7 +146,11 @@ sub register($self, $app, $app_config) {
     },
     on_activity => sub ($c, $u) {
       my $now = DateTime::Format::MySQL->format_datetime(DateTime->now(time_zone => 'local'));
-      $u->update({last_activity_at => $now})
+      $u->update({last_activity_at => $now});
+      if($app->conf->auth->enable_media_access) {
+        if(my $token = $c->__oidc_token(undef, 0)) { $c->cookie(oidc_auth_token => $token, { path => '/api', expires => time + 300, samesite => 'Strict' }); return }
+      }
+      $c->cookie(oidc_auth_token => '', { path => '/api', expires => 1 } );
     }
   } });
 
