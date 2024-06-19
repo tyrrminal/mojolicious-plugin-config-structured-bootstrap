@@ -136,7 +136,7 @@ sub register($self, $app, $app_config) {
     },
 
     on_success     => sub ($c, $token, $url) {
-      $c->cookie(oidc_auth_token => $token, { expires => time + 60 });
+      $c->cookie(oidc_auth_token => $token, { path => '/api', expires => time + 60, sameSite => 'Lax' });
       $c->redirect_to($url);
     },
     on_login => sub ($c, $u) {
