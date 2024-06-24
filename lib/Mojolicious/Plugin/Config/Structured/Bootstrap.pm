@@ -109,7 +109,7 @@ sub register($self, $app, $app_config) {
     client_secret  => $app->conf->auth->client_secret(1),
     public_key     => $app->conf->auth->public_key,
     well_known_url => $app->conf->auth->well_known_url,
-    base_url       => $app->conf->urls->frontend,
+    base_url       => $app->conf->urls->backend,
     login_path     => '/api/auth/login',
     make_routes    => 0,
 
